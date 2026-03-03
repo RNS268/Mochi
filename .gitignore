@@ -1,0 +1,11 @@
+# Credentials and API keys
+config.h
+
+# Arduino build artifacts
+build/
+*.o
+*.elf
+*.bin
+
+# MacOS
+.DS_Store
