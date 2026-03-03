@@ -1,0 +1,75 @@
+================================================================================
+🚀 MOCHI: DEPLOYMENT & CIRCUIT WIRING GUIDE
+================================================================================
+
+This guide provides the physical wiring connections and software deployment 
+steps for your Mochi robot assistant.
+
+--------------------------------------------------------------------------------
+📍 1. CIRCUIT WIRING (ESP32-S3 N16R8)
+--------------------------------------------------------------------------------
+
+[A] 0.96" SSD1306 OLED DISPLAY (I2C)
+    OLED VCC   --> ESP32 3.3V
+    OLED GND   --> ESP32 GND
+    OLED SDA   --> ESP32 GPIO 8
+    OLED SCL   --> ESP32 GPIO 9
+
+[B] INMP441 I2S MICROPHONE
+    MIC VCC    --> ESP32 3.3V
+    MIC GND    --> ESP32 GND
+    MIC L/R    --> ESP32 GND (Selects Left Channel)
+    MIC SCK    --> ESP32 GPIO 41
+    MIC WS     --> ESP32 GPIO 42
+    MIC SD     --> ESP32 GPIO 2
+
+[C] MAX98357A I2S AMPLIFIER + SPEAKER
+    AMP VIN    --> ESP32 5V (For better audio loudness)
+    AMP GND    --> ESP32 GND
+    AMP GAIN   --> (Leave Unconnected for 9dB gain)
+    AMP BCLK   --> ESP32 GPIO 5
+    AMP LRCK   --> ESP32 GPIO 6
+    AMP DIN    --> ESP32 GPIO 7
+    SPEAKER +/- --> Connect to Amp Screw Terminals
+
+[D] HIGH-POWER IR TRANSMITTER (940nm)
+    *Important: Do NOT connect IR LED directly to GPIO pins*
+    VCC (5V)   --> IR LED Anode (+)
+    IR LED Cathode (-) --> 100 Ohm Resistor --> NPN Transistor Collector
+    Transistor Base   --> 1k Ohm Resistor --> ESP32 GPIO 10
+    Transistor Emitter --> ESP32 GND
+
+--------------------------------------------------------------------------------
+📦 2. SOFTWARE DEPLOYMENT (ARDUINO IDE)
+--------------------------------------------------------------------------------
+
+STEP 1: Install Boards
+    - Open Arduino IDE Preferences.
+    - Add to "Additional Boards Manager URLs":
+      https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+    - Go to Board Manager and install "esp32" by Espressif.
+
+STEP 2: Install Libraries
+    - Open Library Manager and search for/install:
+      1. Adafruit SSD1306
+      2. Adafruit GFX Library
+      3. ArduinoJson
+      4. IRremoteESP8266
+
+STEP 3: Configure Credentials
+    - Rename the provided 'config.h.example' to 'config.h'.
+    - Input your WiFi SSID, Password, and API keys (OpenAI & Deepgram).
+
+STEP 4: Upload Settings
+    - Board: "ESP32S3 Dev Module"
+    - USB CDC On Boot: "Enabled"
+    - Flash Mode: "QIO 80MHz" (or OPI for N16R8)
+    - PSRAM: "OPI PSRAM"
+    - Flash Size: "16MB"
+    - Click Upload!
+
+--------------------------------------------------------------------------------
+🛡️ PRIVACY NOTE:
+Mochi uses local wake-word detection (Hey Mochi). Audio is only sent to the 
+cloud AFTER the local trigger is detected.
+--------------------------------------------------------------------------------
