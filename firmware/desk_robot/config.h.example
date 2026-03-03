@@ -1,0 +1,36 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// WiFi Credentials
+const char* WIFI_SSID = "YOUR_SSID";
+const char* WIFI_PASS = "YOUR_PASSWORD";
+
+// I2S Mic (INMP441)
+#define I2S_MIC_SCK 41
+#define I2S_MIC_WS  42
+#define I2S_MIC_SD  2
+
+// I2S Amp (MAX98357A)
+#define I2S_AMP_BCLK 5
+#define I2S_AMP_LRCK 6
+#define I2S_AMP_DIN  7
+
+// OLED (SSD1306)
+#define OLED_SDA 8
+#define OLED_SCL 9
+#define OLED_RESET -1 // Not used
+
+// IR Transmitter
+#define IR_TX_PIN 10
+
+// API Keys
+const char* OPENAI_API_KEY = "YOUR_OPENAI_API_KEY";
+const char* DEEPGRAM_API_KEY = "YOUR_DEEPGRAM_API_KEY";
+
+// Root CA (Let's Encrypt)
+const char* ROOT_CA = \
+"-----BEGIN CERTIFICATE-----\n" \
+"...\n" \
+"-----END CERTIFICATE-----\n";
+
+#endif
