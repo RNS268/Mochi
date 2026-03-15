@@ -20,8 +20,9 @@ const char* WIFI_PASS = "YOUR_PASSWORD";
 #define OLED_SCL 9
 #define OLED_RESET -1 // Not used
 
-// IR Transmitter
+// IR (TSOP38238 receiver, 940nm LED transmitter)
 #define IR_TX_PIN 10
+#define IR_RX_PIN 11
 
 // API Keys
 const char* OPENAI_API_KEY = "YOUR_OPENAI_API_KEY";

@@ -1,0 +1,41 @@
+Mochi - ESP32-S3 Tabletop Assistant Robot Capabilities
+=====================================================
+Based on the current firmware (desk_robot.ino), here is the complete list of what Mochi can do:
+
+1. Always-on Wake Word Detection & Advanced VAD
+   - Mochi constantly listens in the background for its wake word without blocking other processes.
+   - Uses Voice Activity Detection (VAD) to dynamically determine when the user has stopped speaking, allowing natural phrasing without a hard 2-second limit.
+
+2. Audio Recording & Dynamic Buffer Processing
+   - Automatically records speech intelligently, stopping only when a pause is detected.
+   - Evaluates RMS volume to detect background silence vs active speaking.
+   - Packages raw 16-bit, 16kHz audio internally into a WAV file format directly in memory.
+
+3. Cloud Speech-To-Text (STT) 
+   - Sends the packaged WAV audio securely to a cloud API to convert the user's spoken words into a text transcript.
+
+4. Intelligent & Custom IR Learning
+   - Parses transcripts for built-in local intent commands (e.g., "turn on tv").
+   - Supports a "Learn" mode (e.g., "Learn bedroom light") where Mochi enters a specialized listening state to capture remote control IR pulses, associate them with a name, and store them.
+   - Audibly acknowledges IR commands ("Your TV is on") using TTS or fallback beeps.
+
+5. Cloud AI Integration
+   - Queries a cloud-based AI engine using the spoken transcript to generate conversational, intelligent responses.
+
+6. Expressive OLED Animations
+   - Drives a 128x64 OLED display using a dedicated, multi-threaded FreeRTOS task running cleanly at 15 FPS.
+   - Changes expression dynamically based on state: EYES_IDLE, EYES_LISTENING, EYES_THINKING, and EYES_HAPPY.
+
+7. Resilient WiFi Architecture
+   - Connects to local WiFi for cloud functionality.
+   - Equipped with connection timeouts and allocation fallbacks to ensure the robot doesn't crash or permanently hang if the network disconnects or memory gets fragmented.
+
+8. Expressive Audio Feedback (Beeps & TTS)
+   - Plays expressive beeping tones based on state completion or failure (e.g., recognizing commands, starting/stopping learning).
+   - Is primed to use Cloud TTS audio callbacks to audibly speak out the AI response if the payload fits inside the generous 64KB TTS memory buffer.
+
+9. Structured State Machine
+   - Orchestrates its entire workflow perfectly using clear sequence stages: IDLE -> LISTENING -> THINKING -> SPEAKING -> LEARN_IR.
+
+Planned/Upcoming Capabilities (TODOs):
+- Text-to-Speech (TTS) audio playback to verbally speak the AI's responses back to the user.

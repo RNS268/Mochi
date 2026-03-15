@@ -22,12 +22,12 @@ public:
     unsigned long currentMillis = millis();
     
     if (_state == EYES_IDLE) {
-      // Blink logic
+      // Paper: ~15 blinks per minute = 4s average interval
       if (currentMillis - _lastBlinkTime > _blinkInterval) {
         _isBlinking = true;
         if (currentMillis - _lastBlinkTime > _blinkInterval + _blinkDuration) {
           _lastBlinkTime = currentMillis;
-          _blinkInterval = random(2000, 6000);
+          _blinkInterval = 3600 + random(800); // 3.6–4.4 s
           _isBlinking = false;
         }
       }
@@ -40,7 +40,7 @@ private:
   Adafruit_SSD1306& _display;
   AnimationState _state = EYES_IDLE;
   unsigned long _lastBlinkTime = 0;
-  unsigned long _blinkInterval = 3000;
+  unsigned long _blinkInterval = 3800; // ~15/min
   unsigned long _blinkDuration = 150;
   bool _isBlinking = false;
 
@@ -66,30 +66,34 @@ private:
         break;
 
       case EYES_LISTENING: {
-        // Pulse effect
-        int pulse = (sin(millis() / 200.0) * 4) + 10;
-        _display.fillCircle(leftEyeX, eyeY, pulse, SSD1306_WHITE);
-        _display.fillCircle(rightEyeX, eyeY, pulse, SSD1306_WHITE);
+        // Paper: wide-open, still eyes
+        _display.fillCircle(leftEyeX, eyeY, eyeRadius, SSD1306_WHITE);
+        _display.fillCircle(rightEyeX, eyeY, eyeRadius, SSD1306_WHITE);
+        _display.fillCircle(leftEyeX + 2, eyeY - 2, 2, SSD1306_BLACK);
+        _display.fillCircle(rightEyeX + 2, eyeY - 2, 2, SSD1306_BLACK);
         break;
       }
 
       case EYES_THINKING: {
-        // Spinning dots
-        float angle = millis() / 150.0;
-        for (int i=0; i<3; i++) {
-          int xOffset = cos(angle + i*2.09) * 15;
-          int yOffset = sin(angle + i*2.09) * 15;
-          _display.fillCircle(64 + xOffset, 32 + yOffset, 4, SSD1306_WHITE);
-        }
+        // Paper: eyes shifting side to side
+        float t = millis() / 200.0f;
+        int shift = (int)(sin(t) * 8);
+        _display.fillCircle(leftEyeX + shift, eyeY, eyeRadius, SSD1306_WHITE);
+        _display.fillCircle(rightEyeX + shift, eyeY, eyeRadius, SSD1306_WHITE);
+        _display.fillCircle(leftEyeX + shift + 2, eyeY - 2, 2, SSD1306_BLACK);
+        _display.fillCircle(rightEyeX + shift + 2, eyeY - 2, 2, SSD1306_BLACK);
         break;
       }
 
-      case EYES_HAPPY:
-        // Use semi-circles for happy eyes
-        _display.drawCircle(leftEyeX, eyeY + 5, eyeRadius, SSD1306_WHITE);
-        _display.drawCircle(rightEyeX, eyeY + 5, eyeRadius, SSD1306_WHITE);
-        _display.fillRect(leftEyeX - eyeRadius, eyeY + 5, eyeRadius * 2 + 1, eyeRadius + 1, SSD1306_BLACK);
+      case EYES_HAPPY: {
+        // Paper: upward-arching eyes (engaged and positive)
+        int arcY = eyeY + 4;
+        _display.drawCircle(leftEyeX, arcY, eyeRadius, SSD1306_WHITE);
+        _display.drawCircle(rightEyeX, arcY, eyeRadius, SSD1306_WHITE);
+        _display.fillRect(leftEyeX - eyeRadius, arcY, eyeRadius * 2 + 1, eyeRadius + 1, SSD1306_BLACK);
+        _display.fillRect(rightEyeX - eyeRadius, arcY, eyeRadius * 2 + 1, eyeRadius + 1, SSD1306_BLACK);
         break;
+      }
     }
     
     _display.display();

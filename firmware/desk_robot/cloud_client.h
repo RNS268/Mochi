@@ -26,7 +26,7 @@ public:
     JsonArray messages = doc.createNestedArray("messages");
     JsonObject systemMsg = messages.createNestedObject();
     systemMsg["role"] = "system";
-    systemMsg["content"] = "You are Mochi, a friendly table robot assistant. Keep responses short and concise.";
+    systemMsg["content"] = "You are Mochi. For device commands (TV, volume, lights, etc) reply with ONLY a short spoken acknowledgement, 3-8 words. Examples: 'Your TV is on', 'Volume up', 'TV turned off'. If the command is not recognized say 'Command not found'. For other questions, answer briefly.";
     
     JsonObject userMsg = messages.createNestedObject();
     userMsg["role"] = "user";
@@ -50,6 +50,36 @@ public:
 
     http.end();
     return response;
+  }
+
+  // Fetch TTS audio as WAV. Returns bytes written to buffer, or 0 on error.
+  size_t getTTS(String text, uint8_t* buffer, size_t bufSize) {
+    if (WiFi.status() != WL_CONNECTED || bufSize < 1000) return 0;
+    HTTPClient http;
+    http.begin(_client, "https://api.openai.com/v1/audio/speech");
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("Authorization", "Bearer " + String(OPENAI_API_KEY));
+    StaticJsonDocument<256> doc;
+    doc["model"] = "tts-1";
+    doc["input"] = text;
+    doc["voice"] = "alloy";
+    doc["response_format"] = "wav";
+    doc["speed"] = 1.1;
+    String body;
+    serializeJson(doc, body);
+    int code = http.POST(body);
+    size_t written = 0;
+    if (code == 200) {
+      int len = http.getSize();
+      WiFiClient* stream = http.getStreamPtr();
+      if (stream && len > 0 && (size_t)len <= bufSize) {
+        written = stream->readBytes(buffer, len);
+      } else if (stream) {
+        written = stream->readBytes(buffer, bufSize);
+      }
+    }
+    http.end();
+    return written;
   }
 
   String sendAudioToSTT(uint8_t* audioData, size_t size) {
